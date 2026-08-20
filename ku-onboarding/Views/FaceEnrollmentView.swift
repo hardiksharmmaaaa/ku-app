@@ -100,6 +100,22 @@ struct FaceEnrollmentView: View {
                 .padding(.vertical, 6)
                 .padding(.horizontal, 12)
                 .background(KUTheme.white.opacity(0.2), in: Capsule())
+
+            Spacer()
+
+            // Front / back camera switch
+            if camera.isAuthorized, !camera.hasNoCameraDevice {
+                Button {
+                    camera.switchCamera()
+                } label: {
+                    Image(systemName: "arrow.triangle.2.circlepath.camera")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(KUTheme.white)
+                        .padding(10)
+                        .background(KUTheme.white.opacity(0.2), in: Circle())
+                }
+                .accessibilityLabel("Switch camera")
+            }
         }
         .padding(.top, 8)
     }
