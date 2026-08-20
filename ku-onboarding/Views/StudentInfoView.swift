@@ -11,6 +11,9 @@ import SwiftUI
 struct StudentInfoView: View {
     @StateObject private var viewModel = StudentInfoViewModel()
 
+    /// Called with the validated Banner ID when the user taps Continue.
+    var onContinue: (String) -> Void = { _ in }
+
     var body: some View {
         ZStack {
             KUTheme.blueSoft
@@ -70,7 +73,7 @@ struct StudentInfoView: View {
                 Spacer()
 
                 Button {
-                    // Proceed to face enrollment
+                    onContinue(viewModel.bannerID)
                 } label: {
                     Text("Continue")
                         .font(KUTheme.bodyFont)
