@@ -6,27 +6,39 @@
 //
 
 import SwiftUI
-import SwiftData
 
 @main
 struct ku_onboardingApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
-
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
+                .preferredColorScheme(.light)
         }
-        .modelContainer(sharedModelContainer)
+    }
+}
+
+/// Top-level coordinator: shows the KU-branded splash while the app boots,
+/// then routes to the Banner ID entry screen.
+struct RootView: View {
+    @State private var showSplash = true
+
+    var body: some View {
+        ZStack {
+            if showSplash {
+                SplashView()
+                    .transition(.opacity)
+            } else {
+                NavigationStack {
+                    StudentInfoView()
+                        .navigationBarHidden(true)
+                }
+            }
+        }
+        .task {
+            try? await Task.sleep(for: .seconds(1.5))
+            withAnimation(.easeInOut(duration: 0.4)) {
+                showSplash = false
+            }
+        }
     }
 }
