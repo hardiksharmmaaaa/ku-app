@@ -237,11 +237,10 @@ final class GaussianGuide {
     private static var task: Task<Void, Never>?
 
     static let prompts = [
-        "Look straight at the camera",
-        "Smile a little 😊",
+        "Look straight at the camera 👀",
+        "Smile like your final's over 😁",
         "Say cheese! 🧀",
-        "Look straight at the camera",
-        "Smile a little 😊",
+        "Big smile, no passport photo face! 📸",
     ]
 
     static func kickOff(capturing: Bool) {
@@ -257,7 +256,7 @@ final class GaussianGuide {
             while !Task.isCancelled {
                 GuideTicker.shared.update(with: prompts[index % prompts.count])
                 index += 1
-                try? await Task.sleep(for: .milliseconds(900))
+                try? await Task.sleep(for: .milliseconds(1700))
             }
         }
     }

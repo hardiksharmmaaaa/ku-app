@@ -17,6 +17,7 @@ struct FaceEnrollmentView: View {
     @StateObject private var camera = CameraService()
     @StateObject private var viewModel: FaceEnrollmentViewModel
     @StateObject private var ticker = GuideTicker.shared
+    @State private var promptScale: CGFloat = 0.8
 
     init(bannerID: String) {
         _viewModel = StateObject(wrappedValue: FaceEnrollmentViewModel(bannerID: bannerID))
@@ -224,7 +225,13 @@ struct FaceEnrollmentView: View {
                     .padding(.vertical, 12)
                     .background(KUTheme.blue.opacity(0.6), in: Capsule())
                     .contentTransition(.opacity)
-                    .animation(.easeInOut(duration: 0.3), value: ticker.tick)
+                    .scaleEffect(promptScale)
+                    .onChange(of: ticker.tick) { _, _ in
+                        promptScale = 0.85
+                        withAnimation(.spring(duration: 0.5, bounce: 0.5)) {
+                            promptScale = 1.0
+                        }
+                    }
 
                 if viewModel.phase == .capturing || viewModel.isDemoMode {
                     HStack(spacing: 16) {
