@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		F80BBED230371DD700AC7AEA /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = F80BBED130371DD700AC7AEA /* Supabase */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		F80BBEB230371DD500AC7AEA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,7 @@
 		F80BBEA030371DD200AC7AEA /* ku-onboarding.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ku-onboarding.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F80BBEB130371DD500AC7AEA /* ku-onboardingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ku-onboardingTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F80BBEBB30371DD600AC7AEA /* ku-onboardingUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ku-onboardingUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F80BBED330371DD700AC7AEA /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Secrets.xcconfig; path = Config/Secrets.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -65,6 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F80BBED230371DD700AC7AEA /* Supabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,6 +98,7 @@
 				F80BBEB430371DD500AC7AEA /* ku-onboardingTests */,
 				F80BBEBE30371DD600AC7AEA /* ku-onboardingUITests */,
 				F80BBEA130371DD200AC7AEA /* Products */,
+				F8251D8030382F0300BD7D9E /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -103,6 +110,14 @@
 				F80BBEBB30371DD600AC7AEA /* ku-onboardingUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		F8251D8030382F0300BD7D9E /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				F80BBED330371DD700AC7AEA /* Secrets.xcconfig */,
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -125,6 +140,7 @@
 			);
 			name = "ku-onboarding";
 			packageProductDependencies = (
+				F80BBED130371DD700AC7AEA /* Supabase */,
 			);
 			productName = "ku-onboarding";
 			productReference = F80BBEA030371DD200AC7AEA /* ku-onboarding.app */;
@@ -205,9 +221,13 @@
 			knownRegions = (
 				en,
 				Base,
+				ar,
 			);
 			mainGroup = F80BBE9730371DD200AC7AEA;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				F80BBED030371DD700AC7AEA /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F80BBEA130371DD200AC7AEA /* Products */;
 			projectDirPath = "";
@@ -284,6 +304,7 @@
 /* Begin XCBuildConfiguration section */
 		F80BBEC530371DD600AC7AEA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F80BBED330371DD700AC7AEA /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -320,6 +341,7 @@
 		};
 		F80BBEC630371DD600AC7AEA /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F80BBED330371DD700AC7AEA /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -607,6 +629,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F80BBED030371DD700AC7AEA /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F80BBED130371DD700AC7AEA /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F80BBED030371DD700AC7AEA /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F80BBE9830371DD200AC7AEA /* Project object */;
 }

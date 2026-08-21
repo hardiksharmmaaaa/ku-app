@@ -4,5 +4,9 @@
 <dict>
 	<key>UIBackgroundModes</key>
 	<array/>
+	<key>SupabaseURL</key>
+	<string>https://$(SUPABASE_HOST)</string>
+	<key>SupabaseAnonKey</key>
+	<string>$(SUPABASE_ANON_KEY)</string>
 </dict>
 </plist>
