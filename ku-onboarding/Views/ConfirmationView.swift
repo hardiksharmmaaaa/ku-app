@@ -22,7 +22,6 @@ struct ConfirmationView: View {
 
             VStack(spacing: 28) {
                 StepIndicator(step: 2)
-                    .frame(maxWidth: .infinity, alignment: .leading)
 
                 Spacer()
 

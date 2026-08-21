@@ -57,7 +57,10 @@ struct RootView: View {
                             )
                             .navigationBarHidden(true)
                         case .faceEnrollment(let bannerID):
-                            FaceEnrollmentView(bannerID: bannerID)
+                            FaceEnrollmentView(
+                                bannerID: bannerID,
+                                onFinish: { path = [] }
+                            )
                         }
                     }
                 }

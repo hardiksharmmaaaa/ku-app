@@ -21,29 +21,22 @@ struct StudentInfoView: View {
 
             VStack(spacing: 28) {
                 StepIndicator(step: 1)
-                    .frame(maxWidth: .infinity, alignment: .leading)
 
                 Spacer()
 
-                // KU monogram + wordmark
-                HStack(spacing: 12) {
-                    Circle()
-                        .fill(KUTheme.blue)
-                        .frame(width: 48, height: 48)
-                        .overlay(
-                            Text("KU")
-                                .font(.system(.headline, design: .rounded, weight: .bold))
-                                .foregroundStyle(KUTheme.white)
-                        )
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Khalifa University")
-                            .font(KUTheme.titleFont)
-                            .foregroundStyle(KUTheme.text)
-                        Text("Smart Attendance Enrollment")
-                            .font(KUTheme.captionFont)
-                            .foregroundStyle(KUTheme.text.opacity(0.6))
-                    }
+                // Official KU logo + tagline, centered
+                VStack(spacing: 10) {
+                    Image("KULogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 64)
+                        .accessibilityHidden(true)
+
+                    Text("Smart Attendance Enrollment")
+                        .font(KUTheme.captionFont)
+                        .foregroundStyle(KUTheme.text.opacity(0.6))
                 }
+                .frame(maxWidth: .infinity)
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Your Banner ID")

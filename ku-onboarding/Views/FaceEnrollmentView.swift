@@ -19,8 +19,13 @@ struct FaceEnrollmentView: View {
     @StateObject private var ticker = GuideTicker.shared
     @State private var promptScale: CGFloat = 0.8
 
-    init(bannerID: String) {
+    /// Called when the flow reaches a terminal state (enrolled / already
+    /// enrolled) so the coordinator can send the student back to the start.
+    var onFinish: () -> Void = {}
+
+    init(bannerID: String, onFinish: @escaping () -> Void = {}) {
         _viewModel = StateObject(wrappedValue: FaceEnrollmentViewModel(bannerID: bannerID))
+        self.onFinish = onFinish
     }
 
     var body: some View {
@@ -338,7 +343,7 @@ struct FaceEnrollmentView: View {
                 .background(KUTheme.blueDeep.opacity(0.55), in: RoundedRectangle(cornerRadius: KUTheme.cornerRadius))
 
                 Button("Done") {
-                    dismiss()
+                    onFinish()
                 }
                 .buttonStyle(KUFilledButtonStyle())
                 .padding(.top, 6)
@@ -390,7 +395,7 @@ struct FaceEnrollmentView: View {
                     .padding(.horizontal, 24)
 
                 Button("Done") {
-                    dismiss()
+                    onFinish()
                 }
                 .buttonStyle(KUFilledButtonStyle())
                 .padding(.top, 14)

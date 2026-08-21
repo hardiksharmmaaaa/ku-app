@@ -23,7 +23,6 @@ struct ConsentView: View {
 
             VStack(spacing: 24) {
                 StepIndicator(step: 3)
-                    .frame(maxWidth: .infinity, alignment: .leading)
 
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 22) {
