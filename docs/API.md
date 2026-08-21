@@ -10,7 +10,7 @@ Uploads Banner ID + face frames for embedding generation.
 
 | Field | Type | Notes |
 |---|---|---|
-| `banner_id` | string | e.g. `B00123456` |
+| `banner_id` | string | e.g. `100012345` |
 | `frames[]` | files (JPEG) | 5–10 images, ~80% quality |
 
 ### Response — success `200`

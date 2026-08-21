@@ -91,7 +91,7 @@ Required for the Face Enrollment screen once Phase 3+ lands.
 | Screen / Feature | Status | How to exercise |
 |---|---|---|
 | Splash + KU branding | ✅ Implemented | Simulator or device |
-| Banner ID entry + validation | ✅ Implemented | Type `B00123456` → Continue enables |
+| Banner ID entry + validation | ✅ Implemented | Type `100012345` → Continue enables |
 | Banner ID unit tests | ✅ Implemented | `xcodebuild test` |
 | Camera preview + capture | 🕓 Phase 3 | Physical iPhone |
 | Vision face-gated capture | 🕓 Phase 4 | Physical iPhone |
@@ -110,7 +110,7 @@ xcodebuild -project ku-onboarding.xcodeproj -scheme ku-onboarding \
   -configuration Debug test
 ```
 
-Covers: valid format, invalid formats, and input normalization (`b001` → `B001`).
+Covers: valid format, invalid formats, and input normalization (`10001` → `10001`).
 
 ### UI tests
 

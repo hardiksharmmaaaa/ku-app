@@ -38,8 +38,8 @@ Splash / KU Branding Screen          (implemented — KU logo + brand gradient)
    │
    ▼
 Student Information Screen           (implemented — Banner ID + validation)
-   ├─ Banner ID (e.g., B00123456)
-   ├─ Format validation (^B\d{8}$)
+    ├─ Banner ID (e.g., 100012345)
+    ├─ Format validation (^1000\d{5}$)
    └─ Continue button (disabled until valid)
    │
    ▼
@@ -71,7 +71,7 @@ Success Screen                       (Phase 6)
 ### 4.1 Student Information Screen ✅ (Phase 2 — implemented)
 - Single large centered input, Banner ID only.
 - `TextField` with `.keyboardType(.asciiCapable)` and autocapitalization normalized to uppercase.
-- Client-side validation: `^B\d{8}$` (leading `B` + 8 digits). Adjust to KU's actual format if different.
+- Client-side validation: `^1000\d{5}$` (leading `1000` + 5 digits). Adjust to KU's actual format if different.
 - "Continue" enabled only when `isValid`.
 - Helper caption: "Your Banner ID is printed on your student card and available in MyKU."
 

@@ -426,5 +426,5 @@ struct KUOutlineButtonStyle: ButtonStyle {
 }
 
 #Preview {
-    FaceEnrollmentView(bannerID: "B00123456")
+    FaceEnrollmentView(bannerID: "100012345")
 }
