@@ -13,7 +13,7 @@ final class StudentInfoViewModel: ObservableObject {
 
     @Published var bannerID = "" {
         didSet {
-            let normalized = bannerID.uppercased().filter { $0.isLetter || $0.isNumber }
+            let normalized = bannerID.filter { $0.isNumber }
             if normalized != bannerID {
                 bannerID = normalized
             }
@@ -23,8 +23,8 @@ final class StudentInfoViewModel: ObservableObject {
     @Published private(set) var errorMessage = ""
 
     /// Khalifa University Banner ID format:
-    /// a single leading letter (B) followed by 8 digits, e.g. B00123456.
-    private static let pattern = #"^B\d{8}$"#
+    /// starts with 1000 followed by 5 digits, e.g. 100069933 (9 digits total).
+    private static let pattern = #"^1000\d{5}$"#
 
     static func isBannerIDValid(_ id: String) -> Bool {
         id.range(of: pattern, options: .regularExpression) != nil
@@ -40,7 +40,7 @@ final class StudentInfoViewModel: ObservableObject {
         } else if isValid {
             errorMessage = ""
         } else {
-            errorMessage = "Banner ID must start with 'B' followed by 8 digits (e.g., B00123456)."
+            errorMessage = "Banner ID must start with '1000' followed by 5 digits (e.g., 100xxxxx)."
         }
     }
 }

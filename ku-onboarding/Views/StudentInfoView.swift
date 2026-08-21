@@ -47,7 +47,7 @@ struct StudentInfoView: View {
                         .font(KUTheme.bodyFont)
                         .foregroundStyle(KUTheme.text)
 
-                    TextField("e.g. B00123456", text: $viewModel.bannerID)
+                    TextField("e.g. 100012345", text: $viewModel.bannerID)
                         .font(.system(.title3, design: .rounded, weight: .medium))
                         .textInputAutocapitalization(.characters)
                         .autocorrectionDisabled()
