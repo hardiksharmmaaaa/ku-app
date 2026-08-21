@@ -2,7 +2,7 @@
 
 Single source of truth for every document in this project. Keep this table current whenever a document is added, changed, or deprecated.
 
-Last updated: 20 August 2026
+Last updated: 21 August 2026
 
 ---
 
@@ -20,6 +20,7 @@ Last updated: 20 August 2026
 | D-008 | API Contract | [`docs/API.md`](API.md) | Contract | Backend Dev | ⚠️ Needs review |
 | D-009 | UX / Wireframes | [`docs/UX.md`](UX.md) | Design | Product | ✅ Current |
 | D-010 | Test Plan | [`docs/TESTING.md`](TESTING.md) | QA | QA | ✅ Current |
+| D-011 | Supabase Backend Plan | [`docs/SUPABASE.md`](SUPABASE.md) | Design/Plan | Lead Dev | 🕓 In implementation |
 
 Legend: ✅ Current · 🕓 Planned · ⚠️ Needs review · 🗄️ Archived
 

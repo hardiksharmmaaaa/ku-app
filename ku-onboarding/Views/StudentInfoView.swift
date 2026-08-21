@@ -20,6 +20,9 @@ struct StudentInfoView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 28) {
+                StepIndicator(step: 1)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
                 Spacer()
 
                 // KU monogram + wordmark
@@ -49,9 +52,9 @@ struct StudentInfoView: View {
 
                     TextField("e.g. 100012345", text: $viewModel.bannerID)
                         .font(.system(.title3, design: .rounded, weight: .medium))
-                        .textInputAutocapitalization(.characters)
+                        .monospacedDigit()
                         .autocorrectionDisabled()
-                        .keyboardType(.asciiCapable)
+                        .keyboardType(.numberPad)
                         .padding()
                         .background(KUTheme.white)
                         .clipShape(RoundedRectangle(cornerRadius: KUTheme.cornerRadius))
@@ -62,6 +65,18 @@ struct StudentInfoView: View {
                                     lineWidth: 2
                                 )
                         )
+                        .toolbar {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                Spacer()
+                                Button("Done") {
+                                    UIApplication.shared.sendAction(
+                                        #selector(UIResponder.resignFirstResponder),
+                                        to: nil, from: nil, for: nil
+                                    )
+                                }
+                                .font(KUTheme.bodyFont.bold())
+                            }
+                        }
 
                     if !viewModel.errorMessage.isEmpty {
                         Text(viewModel.errorMessage)
@@ -73,6 +88,7 @@ struct StudentInfoView: View {
                 Spacer()
 
                 Button {
+                    Haptics.tap()
                     onContinue(viewModel.bannerID)
                 } label: {
                     Text("Continue")

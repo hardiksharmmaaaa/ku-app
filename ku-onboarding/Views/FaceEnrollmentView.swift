@@ -34,6 +34,8 @@ struct FaceEnrollmentView: View {
                 processingStage
             case .success:
                 successStage
+            case .alreadyEnrolled:
+                alreadyEnrolledStage
             case .timedOut:
                 timedOutStage
             case .error(let msg):
@@ -186,8 +188,10 @@ struct FaceEnrollmentView: View {
 
     private var permissionTitle: String {
         camera.hasNoCameraDevice
-            ? "Simulator Detected"
-            : (camera.isAuthorized ? "Camera Ready" : "Camera Access Required")
+            ? String(localized: "Simulator Detected")
+            : (camera.isAuthorized
+                ? String(localized: "Camera Ready")
+                : String(localized: "Camera Access Required"))
     }
 
     private var permissionMessage: String {
@@ -247,6 +251,9 @@ struct FaceEnrollmentView: View {
                                 .foregroundStyle(KUTheme.white)
                         }
                         .frame(width: 76, height: 76)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Capture progress")
+                        .accessibilityValue("\(viewModel.capturedCount) of \(viewModel.targetFrameCount) frames")
 
                         Text(statusText)
                             .font(KUTheme.bodyFont)
@@ -263,7 +270,7 @@ struct FaceEnrollmentView: View {
     private var statusText: String {
         viewModel.isDemoMode
             ? "Simulating capture — \(viewModel.capturedCount) of \(viewModel.targetFrameCount)"
-            : "Capturing your face"
+            : String(localized: "Capturing your face")
     }
 
     // MARK: - Processing stage
@@ -299,6 +306,7 @@ struct FaceEnrollmentView: View {
                     .font(.system(size: 84))
                     .foregroundStyle(KUTheme.white)
                     .symbolEffect(.bounce, value: 1)
+                    .accessibilityHidden(true)
 
                 Text("Thank You!!")
                     .font(KUTheme.displayFont)
@@ -310,18 +318,83 @@ struct FaceEnrollmentView: View {
 
                 Text(viewModel.bannerID)
                     .font(KUTheme.bodyFont.bold())
+                    .monospacedDigit()
                     .foregroundStyle(KUTheme.white)
                     .padding(.vertical, 8)
                     .padding(.horizontal, 20)
                     .background(KUTheme.white.opacity(0.2), in: Capsule())
 
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("What happens next?")
+                        .font(KUTheme.bodyFont.bold())
+                        .foregroundStyle(KUTheme.white)
+
+                    nextStepRow(icon: "hourglass", text: "Your face template is processed securely on university servers.")
+                    nextStepRow(icon: "door.right.hand.open", text: "You'll be recognized automatically at attendance kiosks.")
+                    nextStepRow(icon: "iphone.slash", text: "Nothing is stored on this device.")
+                }
+                .padding(18)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(KUTheme.blueDeep.opacity(0.55), in: RoundedRectangle(cornerRadius: KUTheme.cornerRadius))
+
                 Button("Done") {
                     dismiss()
                 }
                 .buttonStyle(KUFilledButtonStyle())
-                .padding(.top, 18)
+                .padding(.top, 6)
             }
             .padding(24)
+        }
+    }
+
+    private func nextStepRow(icon: String, text: LocalizedStringKey) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(KUTheme.white.opacity(0.9))
+                .frame(width: 22)
+                .accessibilityHidden(true)
+            Text(text)
+                .font(KUTheme.captionFont)
+                .foregroundStyle(KUTheme.white.opacity(0.9))
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    // MARK: - Already enrolled stage
+
+    private var alreadyEnrolledStage: some View {
+        ZStack {
+            KUTheme.heroGradient.ignoresSafeArea()
+
+            VStack(spacing: 16) {
+                Image(systemName: "person.crop.circle.badge.checkmark")
+                    .font(.system(size: 72))
+                    .foregroundStyle(KUTheme.white)
+                    .accessibilityHidden(true)
+
+                Text("Already Enrolled")
+                    .font(KUTheme.titleFont)
+                    .foregroundStyle(KUTheme.white)
+
+                Text("Banner ID \(viewModel.bannerID) already has an active face enrollment.")
+                    .font(KUTheme.bodyFont)
+                    .foregroundStyle(KUTheme.white.opacity(0.9))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+
+                Text("If you need to re-enroll (for example after a device change), please contact KU IT services.")
+                    .font(KUTheme.captionFont)
+                    .foregroundStyle(KUTheme.white.opacity(0.75))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+
+                Button("Done") {
+                    dismiss()
+                }
+                .buttonStyle(KUFilledButtonStyle())
+                .padding(.top, 14)
+            }
         }
     }
 
@@ -366,11 +439,17 @@ struct FaceEnrollmentView: View {
                     .foregroundStyle(KUTheme.white)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 24)
+                if viewModel.canRetryUpload {
+                    Button("Try Again") {
+                        viewModel.retryUpload()
+                    }
+                    .buttonStyle(KUFilledButtonStyle())
+                    .padding(.top, 8)
+                }
                 Button("Back") {
                     dismiss()
                 }
-                .buttonStyle(KUFilledButtonStyle())
-                .padding(.top, 8)
+                .buttonStyle(KUOutlineButtonStyle())
             }
         }
     }
@@ -390,6 +469,7 @@ struct ScannerScanLine: View {
                 .shadow(color: KUTheme.blue.opacity(0.9), radius: 8)
                 .position(x: geo.size.width / 2, y: geo.size.height * position)
         }
+        .accessibilityHidden(true)
         .onAppear {
             withAnimation(.linear(duration: 2.0).repeatForever(autoreverses: true)) {
                 position = 0.85
