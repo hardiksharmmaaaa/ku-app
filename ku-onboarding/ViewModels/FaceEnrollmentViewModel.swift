@@ -45,6 +45,9 @@ final class FaceEnrollmentViewModel: ObservableObject {
     ]
 
     let targetFrameCount = 10
+    /// Maximum idle gap between accepted frames. Reset on every accepted
+    /// frame — if the face disappears mid-capture, the session times out
+    /// instead of proceeding with partial data.
     let captureTimeout: TimeInterval = 10
     /// Minimum total "journey" duration so the experience always feels like
     /// ~10 seconds even when quality gates pass instantly.
@@ -52,8 +55,6 @@ final class FaceEnrollmentViewModel: ObservableObject {
     /// How often a quality-passed frame is accepted during real capture
     /// (spreads 10 frames across ~10s instead of accepting every frame).
     let framePacing: TimeInterval = 1.0
-    /// The backend rejects enrollments with fewer than this many frames.
-    let minimumUploadableFrames = 5
 
     private let faceDetection = FaceDetectionService()
     private let imageProcessing = ImageProcessingService()
@@ -72,7 +73,7 @@ final class FaceEnrollmentViewModel: ObservableObject {
     /// so the error screen can offer a retry instead of recapture.
     var canRetryUpload: Bool {
         guard case .error = phase else { return false }
-        return acceptedFrames.count >= minimumUploadableFrames
+        return !acceptedFrames.isEmpty
     }
 
     let bannerID: String
@@ -169,6 +170,9 @@ final class FaceEnrollmentViewModel: ObservableObject {
 
         if capturedCount >= targetFrameCount {
             finishCapture()
+        } else {
+            // Keep the session alive while the face keeps delivering frames.
+            startTimeout()
         }
     }
 
@@ -191,24 +195,26 @@ final class FaceEnrollmentViewModel: ObservableObject {
             // Hold the session a beat past the pacing so energy always lands ~10s.
             try? await Task.sleep(for: .seconds(self?.captureTimeout ?? 10))
             guard !Task.isCancelled else { return }
-            self?.finishCapture()
+            self?.handleIdleTimeout()
         }
     }
 
-    /// Ends the capture step, honoring the minimum journey duration before the
-    /// transition to the "Processing all your faces…" animation.
-    private func finishCapture() {
+    /// Fires only when the face stopped delivering usable frames before the
+    /// target was reached — never proceed to processing with partial data.
+    private func handleIdleTimeout() {
         guard phase == .capturing else { return }
+        phase = .timedOut
+        Haptics.error()
+        GaussianGuide.kickOff(capturing: false)
+    }
+
+    /// Ends the capture step once every target frame is stored, honoring the
+    /// minimum journey duration before the transition to the
+    /// "Processing all your faces…" animation.
+    private func finishCapture() {
+        guard phase == .capturing, acceptedFrames.count >= targetFrameCount else { return }
         timeoutTask?.cancel()
         demoTask?.cancel()
-
-        // Not enough usable frames for the backend — surface the retry screen.
-        if acceptedFrames.count < minimumUploadableFrames {
-            phase = .timedOut
-            Haptics.error()
-            GaussianGuide.kickOff(capturing: false)
-            return
-        }
 
         let elapsed = Date().timeIntervalSince(captureStart ?? Date())
         let remaining = max(0, minCaptureDuration - elapsed)
@@ -300,7 +306,8 @@ final class FaceEnrollmentViewModel: ObservableObject {
     func resetCapture() {
         resetFrames()
         phase = .ready
-        isDemoMode = false
+        // isDemoMode intentionally survives resets — it reflects the
+        // device's lack of a camera, not the outcome of one attempt.
         GaussianGuide.kickOff(capturing: false)
     }
 }
