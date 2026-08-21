@@ -380,7 +380,7 @@ struct FaceEnrollmentView: View {
 
 /// Animated horizontal scan line sweeping top → bottom. The area is transparent.
 struct ScannerScanLine: View {
-    @State private var position: CGFloat = 0.06
+    @State private var position: CGFloat = 0.2
 
     var body: some View {
         GeometryReader { geo in
@@ -391,8 +391,8 @@ struct ScannerScanLine: View {
                 .position(x: geo.size.width / 2, y: geo.size.height * position)
         }
         .onAppear {
-            withAnimation(.linear(duration: 1.8).repeatForever(autoreverses: true)) {
-                position = 0.94
+            withAnimation(.linear(duration: 2.0).repeatForever(autoreverses: true)) {
+                position = 0.85
             }
         }
     }
