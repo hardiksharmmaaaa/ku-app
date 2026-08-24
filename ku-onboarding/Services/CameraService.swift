@@ -147,6 +147,9 @@ final class CameraService: NSObject, ObservableObject {
 
         session.commitConfiguration()
 
+        // Ensure video orientation stays correct after camera switch
+        videoOutput?.connection(with: .video)?.videoOrientation = .portrait
+
         if wasRunning && !session.isRunning {
             session.startRunning()
         }
