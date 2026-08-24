@@ -15,11 +15,15 @@ iOS app ──multipart POST /api/v1/enroll──▶ API server
 
 ## 2. Embedding generation options
 
-| Option | Use case |
-|---|---|
-| `face_recognition` (dlib) | Fast prototyping on a laptop |
-| InsightFace / ArcFace | Production-grade, self-hosted |
+
+| Option                       | Use case                                                                |
+| ---------------------------- | ----------------------------------------------------------------------- |
+| `face_recognition` (dlib)    | Fast prototyping on a laptop                                            |
+| InsightFace / ArcFace        | Production-grade, self-hosted                                           |
 | AWS Rekognition / Azure Face | Fastest integration, managed, recurring cost + residency considerations |
+
+
+
 
 ## 3. Storage
 
@@ -27,15 +31,21 @@ iOS app ──multipart POST /api/v1/enroll──▶ API server
 - Or vector DBs (Weaviate/Pinecone) when attendance-match scale grows.
 - Raw frames optional; if retained, S3-compatible storage **encrypted at rest**.
 
+
+
 ## 4. Suggested stack
 
-| Layer | Option |
-|---|---|
-| API server | Python (FastAPI) or Node (Express/NestJS) |
-| Embeddings | InsightFace (self-hosted) or managed API |
-| DB | PostgreSQL + pgvector |
-| File storage | S3-compatible, encrypted |
-| Hosting | AWS/Azure (check KU institutional cloud / residency rules) |
+
+| Layer        | Option                                                     |
+| ------------ | ---------------------------------------------------------- |
+| AP,I server  | Python (FastAPI) or Node (Express/NestJS)                  |
+| Embeddings   | InsightFace (self-hosted) or managed API                   |
+| DB           | PostgreSQL + pgvector                                      |
+| File storage | S3-compatible, encrypted                                   |
+| Hosting      | AWS/Azure (check KU institutional cloud / residency rules) |
+
+
+
 
 ## 5. Attendance matching (later, separate system)
 
