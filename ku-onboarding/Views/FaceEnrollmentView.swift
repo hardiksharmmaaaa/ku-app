@@ -268,7 +268,36 @@ struct FaceEnrollmentView: View {
                     .padding(.horizontal, 20)
                     .background(KUTheme.blueDeep.opacity(0.6), in: Capsule())
                 }
+
+                recordControl
             }
+        }
+    }
+
+    // MARK: - Record control (iOS-camera-style shutter)
+
+    /// Red shutter button: circle when idle, morphs into a stop square while
+    /// recording — mirroring the built-in iOS camera.
+    @ViewBuilder
+    private var recordControl: some View {
+        if camera.isAuthorized, !camera.hasNoCameraDevice,
+           viewModel.phase == .ready || viewModel.phase == .capturing {
+            Button {
+                viewModel.recordButtonTapped()
+            } label: {
+                ZStack {
+                    Circle()
+                        .stroke(KUTheme.white.opacity(0.9), lineWidth: 4)
+                    RoundedRectangle(cornerRadius: viewModel.phase == .capturing ? 7 : 30, style: .continuous)
+                        .fill(Color.red)
+                        .padding(viewModel.phase == .capturing ? 25 : 9)
+                }
+                .frame(width: 70, height: 70)
+                .animation(.spring(duration: 0.35, bounce: 0.2), value: viewModel.phase == .capturing)
+                .shadow(color: .black.opacity(0.35), radius: 6, y: 2)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(viewModel.phase == .capturing ? "Stop capture" : "Start face capture")
         }
     }
 
