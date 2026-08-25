@@ -37,6 +37,7 @@ final class CameraService: NSObject, ObservableObject {
     private let session = AVCaptureSession()
     private var videoInput: AVCaptureDeviceInput?
     private var videoOutput: AVCaptureVideoDataOutput?
+    private weak var previewLayer: AVCaptureVideoPreviewLayer?
 
     override init() {
         super.init()
@@ -49,6 +50,8 @@ final class CameraService: NSObject, ObservableObject {
         let layer = AVCaptureVideoPreviewLayer(session: session)
         layer.videoGravity = .resizeAspectFill
         layer.connection?.videoOrientation = .portrait
+        previewLayer = layer
+        updatePreviewScale()
         return layer
     }
 
@@ -106,6 +109,7 @@ final class CameraService: NSObject, ObservableObject {
 
             session.startRunning()
             isRunning = session.isRunning
+            updatePreviewScale()
         } catch {
             unavailableReason = error.localizedDescription
         }
@@ -149,11 +153,17 @@ final class CameraService: NSObject, ObservableObject {
 
         // Ensure video orientation stays correct after camera switch
         videoOutput?.connection(with: .video)?.videoOrientation = .portrait
+        updatePreviewScale()
 
         if wasRunning && !session.isRunning {
             session.startRunning()
         }
         isRunning = session.isRunning
+    }
+
+    private func updatePreviewScale() {
+        guard let previewLayer else { return }
+        previewLayer.setAffineTransform(CGAffineTransform.identity)
     }
 
     // MARK: - Device lookup
