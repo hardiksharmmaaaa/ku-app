@@ -45,6 +45,9 @@ final class FaceEnrollmentViewModel: ObservableObject {
     ]
 
     let targetFrameCount = 10
+    /// Server-side minimum (docs/SUPABASE.md §5) — an early manual stop is
+    /// only allowed once at least this many quality frames are in memory.
+    let minFramesForUpload = 5
     /// Maximum idle gap between accepted frames. Reset on every accepted
     /// frame — if the face disappears mid-capture, the session times out
     /// instead of proceeding with partial data.
@@ -99,12 +102,8 @@ final class FaceEnrollmentViewModel: ObservableObject {
 
             switch phase {
             case .ready:
-                // First good frame begins the timed capture.
-                phase = .capturing
-                captureStart = Date()
-                lastFrameAccept = .distantPast
-                startTimeout()
-                acceptFrame(from: sampleBuffer)
+                // Face is framed well — nudge the student toward the record button.
+                GuideTicker.shared.update(with: String(localized: "Looking good — hit record!"))
             case .capturing:
                 // Pace frames so the journey lasts ~10 seconds.
                 guard Date().timeIntervalSince(lastFrameAccept) >= framePacing else { return }
@@ -124,6 +123,46 @@ final class FaceEnrollmentViewModel: ObservableObject {
         guard phase == .requestingPermission else { return }
         phase = .ready
         GaussianGuide.kickOff(capturing: false)
+    }
+
+    // MARK: - Manual record control
+
+    /// iOS-camera-style shutter behavior: tap to start, tap again to stop early.
+    func recordButtonTapped() {
+        switch phase {
+        case .ready:
+            startCapture()
+        case .capturing:
+            stopCapture()
+        default:
+            break
+        }
+    }
+
+    /// Begins quality-gated capture when the student presses the record button.
+    func startCapture() {
+        guard phase == .ready else { return }
+        resetFrames()
+        phase = .capturing
+        captureStart = Date()
+        lastFrameAccept = .distantPast
+        Haptics.tap()
+        GaussianGuide.kickOff(capturing: true)
+        startTimeout()
+    }
+
+    /// Manual early stop — only proceeds to processing once at least
+    /// `minFramesForUpload` frames are collected, otherwise keeps recording.
+    func stopCapture() {
+        guard phase == .capturing else { return }
+        guard acceptedFrames.count >= minFramesForUpload else {
+            Haptics.warning()
+            GuideTicker.shared.update(
+                with: String(localized: "Keep going — \(minFramesForUpload)+ frames needed")
+            )
+            return
+        }
+        finishCapture()
     }
 
     // MARK: - Simulator demo capture
@@ -212,13 +251,14 @@ final class FaceEnrollmentViewModel: ObservableObject {
     /// minimum journey duration before the transition to the
     /// "Processing all your faces…" animation.
     private func finishCapture() {
-        guard phase == .capturing, acceptedFrames.count >= targetFrameCount else { return }
+        guard phase == .capturing, acceptedFrames.count >= minFramesForUpload else { return }
         timeoutTask?.cancel()
         demoTask?.cancel()
 
         let elapsed = Date().timeIntervalSince(captureStart ?? Date())
         let remaining = max(0, minCaptureDuration - elapsed)
 
+        processingTask?.cancel()
         processingTask = Task { [weak self] in
             // Precisely wait the remainder of the 10-second journey…
             if remaining > 0 {
@@ -326,6 +366,7 @@ final class GuideTicker: ObservableObject {
     private init() {}
 
     func update(with newText: String) {
+        guard text != newText else { return }
         text = newText
         tick += 1
     }
