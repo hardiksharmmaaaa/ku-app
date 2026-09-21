@@ -18,10 +18,13 @@
 // The service-role key bypasses RLS; it never leaves this function.
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import {
+  BANNER_ID_RE,
+  buildEnrollmentFramePath,
+  MAX_FRAMES,
+} from "./storage_path.ts";
 
-const BANNER_ID_RE = /^1000\d{5}$/;
 const MIN_FRAMES = 5;
-const MAX_FRAMES = 10;
 const MAX_FRAME_BYTES = 512 * 1024;
 const FRAME_BUCKET = "enrollment-frames";
 
@@ -89,6 +92,7 @@ Deno.serve(async (req: Request) => {
   }
 
   const enrollmentId = enrollment.id as string;
+  const uploadedPaths: string[] = [];
 
   // Store each frame; roll everything back on any failure so a broken
   // upload never leaves a half-written enrollment blocking retries.
@@ -102,8 +106,7 @@ Deno.serve(async (req: Request) => {
         throw new Error("frame_too_large");
       }
 
-      const path =
-        `${enrollmentId}/frame_${String(frame.index).padStart(2, "0")}.jpg`;
+      const path = buildEnrollmentFramePath(bannerId, frame.index);
       const { error: uploadErr } = await admin.storage
         .from(FRAME_BUCKET)
         .upload(path, bytes, {
@@ -111,6 +114,7 @@ Deno.serve(async (req: Request) => {
           upsert: true,
         });
       if (uploadErr) throw new Error(uploadErr.message);
+      uploadedPaths.push(path);
 
       const { error: rowErr } = await admin.from("enrollment_frames").insert({
         enrollment_id: enrollmentId,
@@ -123,10 +127,9 @@ Deno.serve(async (req: Request) => {
     }
   } catch (cause) {
     const message = cause instanceof Error ? cause.message : "upload_failed";
-    const paths = frames.map(
-      (_, i) => `${enrollmentId}/frame_${String(i).padStart(2, "0")}.jpg`,
-    );
-    await admin.storage.from(FRAME_BUCKET).remove(paths);
+    if (uploadedPaths.length > 0) {
+      await admin.storage.from(FRAME_BUCKET).remove(uploadedPaths);
+    }
     await admin.from("enrollments").delete().eq("id", enrollmentId);
     return fail(message, message === "frame_too_large" ? 400 : 500);
   }
