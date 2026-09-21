@@ -30,7 +30,7 @@ create table if not exists public.enrollment_frames (
   id            uuid primary key default gen_random_uuid(),
   enrollment_id uuid not null references public.enrollments on delete cascade,
   frame_index   int  not null,
-  storage_path  text not null,
+  storage_path  text not null, -- '{banner_id}/frame_03.jpg'
   width         int,
   height        int,
   unique (enrollment_id, frame_index)

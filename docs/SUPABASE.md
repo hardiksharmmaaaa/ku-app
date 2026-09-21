@@ -93,7 +93,7 @@ create table public.enrollment_frames (
   id            uuid primary key default gen_random_uuid(),
   enrollment_id uuid not null references public.enrollments on delete cascade,
   frame_index   int  not null,
-  storage_path  text not null,          -- '{enrollment_id}/frame_03.jpg'
+  storage_path  text not null,          -- '{banner_id}/frame_03.jpg'
   width         int,
   height        int,
   unique (enrollment_id, frame_index)
@@ -134,7 +134,7 @@ Notes:
 |---|---|
 | Bucket | `enrollment-frames` |
 | Visibility | **Private** (signed URLs only) |
-| Path layout | `{enrollment_id}/frame_{NN}.jpg` |
+| Path layout | `{banner_id}/frame_{NN}.jpg` (the student's KU/Banner ID) |
 | Content type | `image/jpeg` |
 | Retention | Frames kept until worker marks `embedded`; optional purge job deletes objects after embedding (config flag in worker) |
 

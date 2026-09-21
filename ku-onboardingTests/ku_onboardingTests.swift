@@ -7,6 +7,9 @@
 
 import Testing
 import Foundation
+import CoreMedia
+import CoreVideo
+import ImageIO
 @testable import ku_onboarding
 
 struct BannerIDTests {
@@ -65,5 +68,69 @@ struct EnrollmentPayloadTests {
     @MainActor
     @Test func deviceModelIsNonEmpty() {
         #expect(!FaceEnrollmentViewModel.deviceModel.isEmpty)
+    }
+}
+
+struct ImageProcessingServiceTests {
+
+    @Test func jpegKeepsPortraitCameraBufferUpright() throws {
+        let sampleBuffer = try makeSampleBuffer(width: 40, height: 80)
+        let jpeg = try #require(ImageProcessingService().jpegData(from: sampleBuffer))
+        let source = try #require(CGImageSourceCreateWithData(jpeg as CFData, nil))
+        let properties = try #require(
+            CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any]
+        )
+
+        #expect(properties[kCGImagePropertyPixelWidth] as? Int == 40)
+        #expect(properties[kCGImagePropertyPixelHeight] as? Int == 80)
+        #expect((properties[kCGImagePropertyOrientation] as? Int ?? 1) == 1)
+    }
+
+    private func makeSampleBuffer(width: Int, height: Int) throws -> CMSampleBuffer {
+        var pixelBuffer: CVPixelBuffer?
+        let attributes = [
+            kCVPixelBufferIOSurfacePropertiesKey: [:] as CFDictionary,
+        ] as CFDictionary
+        let pixelStatus = CVPixelBufferCreate(
+            kCFAllocatorDefault,
+            width,
+            height,
+            kCVPixelFormatType_32BGRA,
+            attributes,
+            &pixelBuffer
+        )
+        #expect(pixelStatus == kCVReturnSuccess)
+        let unwrappedPixelBuffer = try #require(pixelBuffer)
+
+        CVPixelBufferLockBaseAddress(unwrappedPixelBuffer, [])
+        if let baseAddress = CVPixelBufferGetBaseAddress(unwrappedPixelBuffer) {
+            memset(baseAddress, 0x7F, CVPixelBufferGetDataSize(unwrappedPixelBuffer))
+        }
+        CVPixelBufferUnlockBaseAddress(unwrappedPixelBuffer, [])
+
+        var formatDescription: CMVideoFormatDescription?
+        let formatStatus = CMVideoFormatDescriptionCreateForImageBuffer(
+            allocator: kCFAllocatorDefault,
+            imageBuffer: unwrappedPixelBuffer,
+            formatDescriptionOut: &formatDescription
+        )
+        #expect(formatStatus == noErr)
+
+        var timing = CMSampleTimingInfo(
+            duration: .invalid,
+            presentationTimeStamp: .zero,
+            decodeTimeStamp: .invalid
+        )
+        var sampleBuffer: CMSampleBuffer?
+        let sampleStatus = CMSampleBufferCreateReadyWithImageBuffer(
+            allocator: kCFAllocatorDefault,
+            imageBuffer: unwrappedPixelBuffer,
+            formatDescription: try #require(formatDescription),
+            sampleTiming: &timing,
+            sampleBufferOut: &sampleBuffer
+        )
+        #expect(sampleStatus == noErr)
+
+        return try #require(sampleBuffer)
     }
 }
